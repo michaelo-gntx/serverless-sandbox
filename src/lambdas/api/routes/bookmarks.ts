@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { getDb } from "~src/shared/db/client";
 import type { Bookmark, Tag } from "~src/shared/db/types";
 import {
 	BookmarkListQuerySchema,
@@ -44,8 +43,7 @@ const listBookmarksRoute = createRoute({
 router.openapi(listBookmarksRoute, async (c) => {
 	const { limit, offset, collectionId, tagId, search } = c.req.valid("query");
 	const userId = c.get("userId");
-	const db = getDb();
-	const { data, total } = await listBookmarks(db, userId, { limit, offset, collectionId, tagId, search });
+	const { data, total } = await listBookmarks(c.var.db, userId, { limit, offset, collectionId, tagId, search });
 	return c.json(
 		{
 			data: data.map(serializeBookmark),
@@ -75,8 +73,7 @@ const bulkDeleteRoute = createRoute({
 router.openapi(bulkDeleteRoute, async (c) => {
 	const { ids } = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const result = await bulkDeleteBookmarks(db, userId, ids);
+	const result = await bulkDeleteBookmarks(c.var.db, userId, ids);
 	return c.json(result, 200);
 });
 
@@ -100,8 +97,7 @@ const bulkTagRoute = createRoute({
 router.openapi(bulkTagRoute, async (c) => {
 	const data = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const result = await bulkTagBookmarks(db, userId, data);
+	const result = await bulkTagBookmarks(c.var.db, userId, data);
 	return c.json(result, 200);
 });
 
@@ -125,8 +121,7 @@ const createBookmarkRoute = createRoute({
 router.openapi(createBookmarkRoute, async (c) => {
 	const data = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const bookmark = await createBookmark(db, userId, data);
+	const bookmark = await createBookmark(c.var.db, userId, data);
 	return c.json(serializeBookmark(bookmark), 201);
 });
 
@@ -148,8 +143,7 @@ const getBookmarkRoute = createRoute({
 router.openapi(getBookmarkRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const userId = c.get("userId");
-	const db = getDb();
-	const bookmark = await getBookmarkById(db, userId, id);
+	const bookmark = await getBookmarkById(c.var.db, userId, id);
 	return c.json(serializeBookmark(bookmark), 200);
 });
 
@@ -175,8 +169,7 @@ router.openapi(updateBookmarkRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const data = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const bookmark = await updateBookmark(db, userId, id, data);
+	const bookmark = await updateBookmark(c.var.db, userId, id, data);
 	return c.json(serializeBookmark(bookmark), 200);
 });
 
@@ -195,8 +188,7 @@ const deleteBookmarkRoute = createRoute({
 router.openapi(deleteBookmarkRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const userId = c.get("userId");
-	const db = getDb();
-	await deleteBookmark(db, userId, id);
+	await deleteBookmark(c.var.db, userId, id);
 	return c.body(null, 204);
 });
 

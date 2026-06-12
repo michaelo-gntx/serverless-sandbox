@@ -1,28 +1,39 @@
-import { AuroraDSQLPool } from "@aws/aurora-dsql-node-postgres-connector";
+import { Signer } from "@aws-sdk/rds-signer";
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "./schema";
 
-export type DsqlDatabase = NodePgDatabase<typeof schema>;
+export type Database = NodePgDatabase<typeof schema>;
 
-let dbInstance: DsqlDatabase | null = null;
-let pool: AuroraDSQLPool | null = null;
+export type Config = {
+	host: string;
+	name: string;
+	port: number;
+	user: string;
+};
 
-export function getDb(): DsqlDatabase {
-	if (dbInstance) {
-		return dbInstance;
-	}
+let db: Database | null = null;
+let pool: Pool | null = null;
 
-	const endpoint = process.env.DB_ENDPOINT;
-	if (!endpoint) {
-		throw new Error("DB_ENDPOINT environment variable is required.");
-	}
+export async function getDb(config: Config): Promise<Database> {
+	if (db) return db;
 
-	pool = new AuroraDSQLPool({
-		host: endpoint,
-		user: "admin",
+	const signer = new Signer({
+		hostname: config.host,
+		port: config.port,
+		username: config.user,
 	});
 
-	dbInstance = drizzle({ client: pool, schema, casing: "snake_case" });
+	pool = new Pool({
+		host: config.host,
+		port: config.port,
+		user: config.user,
+		password: await signer.getAuthToken(),
+		database: config.name,
+		ssl: { rejectUnauthorized: false },
+	});
 
-	return dbInstance;
+	db = drizzle({ client: pool, schema, casing: "snake_case" });
+
+	return db;
 }

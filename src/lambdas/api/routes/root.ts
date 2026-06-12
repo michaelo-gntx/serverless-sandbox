@@ -1,5 +1,6 @@
 import { Logger } from "@aws-lambda-powertools/logger";
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { sql } from "drizzle-orm";
 import type { AppEnv } from "../types";
 
 const logger = new Logger({ serviceName: "Root" });
@@ -24,7 +25,8 @@ router.openapi(root, (c) => {
 });
 
 const HealthSchema = z.object({
-	status: z.string(),
+	status: z.enum(["ok", "error"]),
+	db: z.enum(["connected", "disconnected"]),
 });
 
 const health = createRoute({
@@ -37,10 +39,20 @@ const health = createRoute({
 			content: { "application/json": { schema: HealthSchema } },
 			description: "Application health",
 		},
+		500: {
+			content: { "application/json": { schema: HealthSchema } },
+			description: "Application health",
+		},
 	},
 });
 
-router.openapi(health, (c) => {
+router.openapi(health, async (c) => {
 	logger.info("Health check.");
-	return c.json({ status: "ok" });
+	try {
+		await c.var.db.execute(sql`SELECT 1`);
+		return c.json({ status: "ok", db: "connected" }, 200);
+	} catch (err) {
+		logger.error("Health check failed", { error: err });
+		return c.json({ status: "error", db: "disconnected" }, 500);
+	}
 });

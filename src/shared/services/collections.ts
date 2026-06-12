@@ -1,9 +1,9 @@
 import { and, count, eq, isNull } from "drizzle-orm";
-import type { DsqlDatabase } from "../db/client";
+import type { Database } from "../db/client";
 import { bookmarks, collections } from "../db/schema";
 import { notFound } from "../errors";
 
-export async function listCollections(db: DsqlDatabase, userId: string, opts: { limit: number; offset: number }) {
+export async function listCollections(db: Database, userId: string, opts: { limit: number; offset: number }) {
 	const where = and(eq(collections.userId, userId), isNull(collections.deletedAt));
 
 	const [data, totalResult] = await Promise.all([
@@ -15,7 +15,7 @@ export async function listCollections(db: DsqlDatabase, userId: string, opts: { 
 	return { data, total };
 }
 
-export async function getCollectionById(db: DsqlDatabase, userId: string, id: string) {
+export async function getCollectionById(db: Database, userId: string, id: string) {
 	const [collection] = await db
 		.select()
 		.from(collections)
@@ -32,7 +32,7 @@ export async function getCollectionById(db: DsqlDatabase, userId: string, id: st
 	return { ...collection, bookmarkCount: countResult?.value ?? 0 };
 }
 
-export async function createCollection(db: DsqlDatabase, userId: string, data: { name: string; description?: string }) {
+export async function createCollection(db: Database, userId: string, data: { name: string; description?: string }) {
 	const [collection] = await db
 		.insert(collections)
 		.values({ ...data, userId })
@@ -41,7 +41,7 @@ export async function createCollection(db: DsqlDatabase, userId: string, data: {
 }
 
 export async function updateCollection(
-	db: DsqlDatabase,
+	db: Database,
 	userId: string,
 	id: string,
 	data: { name?: string; description?: string | null },
@@ -56,7 +56,7 @@ export async function updateCollection(
 	return collection;
 }
 
-export async function deleteCollection(db: DsqlDatabase, userId: string, id: string) {
+export async function deleteCollection(db: Database, userId: string, id: string) {
 	// Nullify collectionId on all bookmarks in this collection (app-layer cascade)
 	await db
 		.update(bookmarks)

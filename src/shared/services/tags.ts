@@ -1,9 +1,9 @@
 import { and, count, eq, isNull } from "drizzle-orm";
-import type { DsqlDatabase } from "../db/client";
+import type { Database } from "../db/client";
 import { bookmarkTags, tags } from "../db/schema";
 import { conflict, notFound } from "../errors";
 
-export async function listTags(db: DsqlDatabase, userId: string, opts: { limit: number; offset: number }) {
+export async function listTags(db: Database, userId: string, opts: { limit: number; offset: number }) {
 	const where = and(eq(tags.userId, userId), isNull(tags.deletedAt));
 
 	const [data, totalResult] = await Promise.all([
@@ -25,7 +25,7 @@ export async function listTags(db: DsqlDatabase, userId: string, opts: { limit: 
 	};
 }
 
-export async function createTag(db: DsqlDatabase, userId: string, data: { name: string }) {
+export async function createTag(db: Database, userId: string, data: { name: string }) {
 	// Enforce uniqueness per user at the application layer
 	const [existing] = await db
 		.select()
@@ -42,7 +42,7 @@ export async function createTag(db: DsqlDatabase, userId: string, data: { name: 
 	return tag;
 }
 
-export async function updateTag(db: DsqlDatabase, userId: string, id: string, data: { name: string }) {
+export async function updateTag(db: Database, userId: string, id: string, data: { name: string }) {
 	// Enforce uniqueness per user at the application layer
 	const [existing] = await db
 		.select()
@@ -62,7 +62,7 @@ export async function updateTag(db: DsqlDatabase, userId: string, id: string, da
 	return tag;
 }
 
-export async function deleteTag(db: DsqlDatabase, userId: string, id: string) {
+export async function deleteTag(db: Database, userId: string, id: string) {
 	const [tag] = await db
 		.delete(tags)
 		.where(and(eq(tags.id, id), eq(tags.userId, userId)))

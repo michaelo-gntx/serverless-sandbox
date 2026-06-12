@@ -1,5 +1,5 @@
 import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
-import type { DsqlDatabase } from "../db/client";
+import type { Database } from "../db/client";
 import { bookmarks, bookmarkTags, tags } from "../db/schema";
 import type { Tag } from "../db/types";
 import { notFound } from "../errors";
@@ -8,7 +8,7 @@ import { notFound } from "../errors";
 // Helpers
 // ---------------------------------------------------------------------------
 
-async function getTagsForBookmarks(db: DsqlDatabase, bookmarkIds: string[]): Promise<Map<string, Tag[]>> {
+async function getTagsForBookmarks(db: Database, bookmarkIds: string[]): Promise<Map<string, Tag[]>> {
 	if (bookmarkIds.length === 0) return new Map();
 
 	const rows = await db
@@ -31,7 +31,7 @@ async function getTagsForBookmarks(db: DsqlDatabase, bookmarkIds: string[]): Pro
 // ---------------------------------------------------------------------------
 
 export async function listBookmarks(
-	db: DsqlDatabase,
+	db: Database,
 	userId: string,
 	opts: {
 		limit: number;
@@ -86,7 +86,7 @@ export async function listBookmarks(
 	};
 }
 
-export async function getBookmarkById(db: DsqlDatabase, userId: string, id: string) {
+export async function getBookmarkById(db: Database, userId: string, id: string) {
 	const [bookmark] = await db
 		.select()
 		.from(bookmarks)
@@ -100,7 +100,7 @@ export async function getBookmarkById(db: DsqlDatabase, userId: string, id: stri
 }
 
 export async function createBookmark(
-	db: DsqlDatabase,
+	db: Database,
 	userId: string,
 	data: {
 		collectionId?: string;
@@ -127,7 +127,7 @@ export async function createBookmark(
 }
 
 export async function updateBookmark(
-	db: DsqlDatabase,
+	db: Database,
 	userId: string,
 	id: string,
 	data: {
@@ -150,7 +150,7 @@ export async function updateBookmark(
 	return { ...bookmark, tags: tagsMap.get(id) ?? [] };
 }
 
-export async function deleteBookmark(db: DsqlDatabase, userId: string, id: string) {
+export async function deleteBookmark(db: Database, userId: string, id: string) {
 	const [bookmark] = await db
 		.update(bookmarks)
 		.set({ deletedAt: new Date() })
@@ -165,7 +165,7 @@ export async function deleteBookmark(db: DsqlDatabase, userId: string, id: strin
 	return bookmark;
 }
 
-export async function bulkDeleteBookmarks(db: DsqlDatabase, userId: string, ids: string[]) {
+export async function bulkDeleteBookmarks(db: Database, userId: string, ids: string[]) {
 	const updated = await db
 		.update(bookmarks)
 		.set({ deletedAt: new Date() })
@@ -182,7 +182,7 @@ export async function bulkDeleteBookmarks(db: DsqlDatabase, userId: string, ids:
 }
 
 export async function bulkTagBookmarks(
-	db: DsqlDatabase,
+	db: Database,
 	userId: string,
 	data: { bookmarkIds: string[]; tagIds: string[]; action: "add" | "remove" },
 ) {

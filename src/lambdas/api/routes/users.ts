@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-import { getDb } from "~src/shared/db/client";
 import { CreateUserSchema, UserSchema } from "~src/shared/schemas/users";
 import { createUser, getUserById } from "~src/shared/services/users";
 import { authentication } from "../middleware";
@@ -29,8 +28,7 @@ const createUserRoute = createRoute({
 
 router.openapi(createUserRoute, async (c) => {
 	const data = c.req.valid("json");
-	const db = getDb();
-	const user = await createUser(db, data);
+	const user = await createUser(c.var.db, data);
 	return c.json(
 		{
 			...user,
@@ -58,10 +56,9 @@ const getUserRoute = createRoute({
 
 router.openapi(getUserRoute, async (c) => {
 	const id = c.var.userId;
-	const db = getDb();
 
 	const segment = c.var.trace.addNewSubsegment(`## query db`);
-	const user = await getUserById(db, id);
+	const user = await getUserById(c.var.db, id);
 	segment.close();
 
 	return c.json(

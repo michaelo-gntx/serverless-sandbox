@@ -25,14 +25,14 @@ type MigrationsEnv = {
 /**
  * Properties for the Database construct.
  */
-export type DatabaseProps = {
+export type AuroraDsqlProps = {
 	/**
 	 * The name of the Aurora DSQL cluster.
 	 */
 	readonly clusterName?: string;
 };
 
-export class Database extends Construct {
+export class AuroraDsql extends Construct {
 	readonly cluster: dsql.Cluster;
 
 	/**
@@ -40,7 +40,7 @@ export class Database extends Construct {
 	 * @param id The id of the construct.
 	 * @param props Options for the database construct.
 	 */
-	constructor(scope: Construct, id: string, props: DatabaseProps) {
+	constructor(scope: Construct, id: string, props: AuroraDsqlProps) {
 		super(scope, id);
 
 		// Create the database cluster
