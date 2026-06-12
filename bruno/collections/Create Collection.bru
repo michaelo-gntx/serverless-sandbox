@@ -1,0 +1,67 @@
+meta {
+  name: Create Collection
+  type: http
+  seq: 2
+  tags: [
+    Collections
+  ]
+}
+
+post {
+  url: {{baseUrl}}/api/v1/collections
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Reading List",
+    "description": "Articles to read later"
+  }
+}
+
+docs {
+  Create Collection
+}
+
+example {
+  name: 201 Response
+  description: Collection created
+
+  request: {
+    url: {{baseUrl}}/api/v1/collections
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "name": "Reading List",
+        "description": "Articles to read later"
+      }
+    }
+  }
+
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+
+    status: {
+      code: 201
+      text: Created
+    }
+
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "userId": "",
+          "name": "",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        }
+      '''
+    }
+  }
+}

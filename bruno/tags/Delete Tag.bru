@@ -1,0 +1,50 @@
+meta {
+  name: Delete Tag
+  type: http
+  seq: 4
+  tags: [
+    Tags
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/tags/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  Delete Tag
+}
+
+example {
+  name: 204 Response
+  description: Tag deleted
+
+  request: {
+    url: {{baseUrl}}/api/v1/tags/:id
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+  }
+
+  response: {
+    status: {
+      code: 204
+      text: No Content
+    }
+
+    body: {
+      type: text
+      content: '''
+
+      '''
+    }
+  }
+}

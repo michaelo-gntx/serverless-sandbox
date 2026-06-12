@@ -1,0 +1,47 @@
+meta {
+  name: Application Readiness
+  type: http
+  seq: 1
+  tags: [
+    Root
+  ]
+}
+
+get {
+  url: {{baseUrl}}/
+  body: none
+  auth: inherit
+}
+
+docs {
+  Application Readiness
+}
+
+example {
+  name: 200 Response
+  description: Application readiness response
+  
+  request: {
+    url: {{baseUrl}}/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: text/plain
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

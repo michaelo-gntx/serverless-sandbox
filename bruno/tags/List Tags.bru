@@ -1,0 +1,55 @@
+meta {
+  name: List Tags
+  type: http
+  seq: 1
+  tags: [
+    Tags
+  ]
+}
+
+get {
+  url: {{baseUrl}}/api/v1/tags
+  body: none
+  auth: inherit
+}
+
+docs {
+  List Tags
+}
+
+example {
+  name: 200 Response
+  description: Tags listed
+
+  request: {
+    url: {{baseUrl}}/api/v1/tags
+    method: GET
+    mode: none
+  }
+
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+
+    status: {
+      code: 200
+      text: OK
+    }
+
+    body: {
+      type: json
+      content: '''
+        {
+          "data": [],
+          "pagination": {
+            "total": 0,
+            "limit": 0,
+            "offset": 0,
+            "hasMore": false
+          }
+        }
+      '''
+    }
+  }
+}

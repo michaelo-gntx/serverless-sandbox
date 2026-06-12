@@ -1,0 +1,50 @@
+meta {
+  name: Delete Collection
+  type: http
+  seq: 5
+  tags: [
+    Collections
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/collections/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  Delete Collection
+}
+
+example {
+  name: 204 Response
+  description: Collection deleted
+
+  request: {
+    url: {{baseUrl}}/api/v1/collections/:id
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+  }
+
+  response: {
+    status: {
+      code: 204
+      text: No Content
+    }
+
+    body: {
+      type: text
+      content: '''
+
+      '''
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+	"$schema": "https://opencode.ai/config.json",
+	"lsp": {
+		"tsgo": {
+			"command": ["node_modules/.bin/tsgo", "--lsp", "--stdio"],
+			"extensions": [".cjs", ".cts", ".js", ".jsx", ".mjs", ".mts", ".ts", ".ts"]
+		},
+		"typescript": {
+			"disabled": true
+		}
+	}
+}

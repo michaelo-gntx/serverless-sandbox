@@ -1,0 +1,66 @@
+meta {
+  name: Update Tag
+  type: http
+  seq: 3
+  tags: [
+    Tags
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/tags/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+body:json {
+  {
+    "name": "typescript"
+  }
+}
+
+docs {
+  Update Tag
+}
+
+example {
+  name: 200 Response
+  description: Tag updated
+
+  request: {
+    url: {{baseUrl}}/api/v1/tags/:id
+    method: PATCH
+    mode: json
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+
+    body:json: {
+      {
+        "name": "typescript"
+      }
+    }
+  }
+
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+
+    status: {
+      code: 200
+      text: OK
+    }
+
+    body: {
+      type: json
+      content: '''
+
+      '''
+    }
+  }
+}

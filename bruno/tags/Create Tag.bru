@@ -1,0 +1,58 @@
+meta {
+  name: Create Tag
+  type: http
+  seq: 2
+  tags: [
+    Tags
+  ]
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tags
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "typescript"
+  }
+}
+
+docs {
+  Create Tag
+}
+
+example {
+  name: 201 Response
+  description: Tag created
+
+  request: {
+    url: {{baseUrl}}/api/v1/tags
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "name": "typescript"
+      }
+    }
+  }
+
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+
+    status: {
+      code: 201
+      text: Created
+    }
+
+    body: {
+      type: json
+      content: '''
+
+      '''
+    }
+  }
+}

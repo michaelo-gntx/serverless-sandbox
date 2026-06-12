@@ -1,0 +1,54 @@
+meta {
+  name: Get Bookmark
+  type: http
+  seq: 5
+  tags: [
+    Bookmarks
+  ]
+}
+
+get {
+  url: {{baseUrl}}/api/v1/bookmarks/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  Get Bookmark
+}
+
+example {
+  name: 200 Response
+  description: Bookmark retrieved
+  
+  request: {
+    url: {{baseUrl}}/api/v1/bookmarks/:id
+    method: GET
+    mode: none
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+  
+      '''
+    }
+  }
+}

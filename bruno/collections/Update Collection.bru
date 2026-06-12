@@ -1,0 +1,75 @@
+meta {
+  name: Update Collection
+  type: http
+  seq: 4
+  tags: [
+    Collections
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/collections/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+body:json {
+  {
+    "name": "Reading List",
+    "description": "Articles to read later"
+  }
+}
+
+docs {
+  Update Collection
+}
+
+example {
+  name: 200 Response
+  description: Collection updated
+
+  request: {
+    url: {{baseUrl}}/api/v1/collections/:id
+    method: PATCH
+    mode: json
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+
+    body:json: {
+      {
+        "name": "Reading List",
+        "description": "Articles to read later"
+      }
+    }
+  }
+
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+
+    status: {
+      code: 200
+      text: OK
+    }
+
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "userId": "",
+          "name": "",
+          "description": "",
+          "createdAt": "",
+          "updatedAt": ""
+        }
+      '''
+    }
+  }
+}

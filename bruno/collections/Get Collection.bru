@@ -1,0 +1,54 @@
+meta {
+  name: Get Collection
+  type: http
+  seq: 3
+  tags: [
+    Collections
+  ]
+}
+
+get {
+  url: {{baseUrl}}/api/v1/collections/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  Get Collection
+}
+
+example {
+  name: 200 Response
+  description: Collection retrieved
+
+  request: {
+    url: {{baseUrl}}/api/v1/collections/:id
+    method: GET
+    mode: none
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+  }
+
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+
+    status: {
+      code: 200
+      text: OK
+    }
+
+    body: {
+      type: json
+      content: '''
+
+      '''
+    }
+  }
+}

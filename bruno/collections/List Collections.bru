@@ -1,0 +1,74 @@
+meta {
+  name: List Collections
+  type: http
+  seq: 1
+  tags: [
+    Collections
+  ]
+}
+
+get {
+  url: {{baseUrl}}/api/v1/collections
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 20
+  offset: 0
+}
+
+
+docs {
+  List Collections
+}
+
+example {
+  name: 200 Response
+  description: Collections listed
+
+  request: {
+    url: {{baseUrl}}/api/v1/collections
+    method: GET
+    mode: none
+    params:query: {
+      limit: 20
+      offset: 0
+    }
+  }
+
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+
+    status: {
+      code: 200
+      text: OK
+    }
+
+    body: {
+      type: json
+      content: '''
+        {
+          "data": [
+            {
+              "id": "",
+              "userId": "",
+              "name": "",
+              "description": "",
+              "createdAt": "",
+              "updatedAt": ""
+            }
+          ],
+          "pagination": {
+            "total": 0,
+            "limit": 0,
+            "offset": 0,
+            "hasMore": false
+          }
+        }
+      '''
+    }
+  }
+}

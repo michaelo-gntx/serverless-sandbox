@@ -1,0 +1,50 @@
+meta {
+  name: Delete Bookmark
+  type: http
+  seq: 7
+  tags: [
+    Bookmarks
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/bookmarks/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 550e8400-e29b-41d4-a716-446655440000
+}
+
+docs {
+  Delete Bookmark
+}
+
+example {
+  name: 204 Response
+  description: Bookmark deleted
+  
+  request: {
+    url: {{baseUrl}}/api/v1/bookmarks/:id
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+  }
+  
+  response: {
+    status: {
+      code: 204
+      text: No Content
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

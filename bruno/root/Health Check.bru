@@ -1,0 +1,49 @@
+meta {
+  name: Health Check
+  type: http
+  seq: 2
+  tags: [
+    Root
+  ]
+}
+
+get {
+  url: {{baseUrl}}/healthz
+  body: none
+  auth: inherit
+}
+
+docs {
+  Health Check
+}
+
+example {
+  name: 200 Response
+  description: Application health
+  
+  request: {
+    url: {{baseUrl}}/healthz
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "status": ""
+        }
+      '''
+    }
+  }
+}

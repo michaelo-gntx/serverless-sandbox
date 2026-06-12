@@ -1,0 +1,64 @@
+meta {
+  name: Bulk Delete Bookmarks
+  type: http
+  seq: 3
+  tags: [
+    Bookmarks
+  ]
+}
+
+post {
+  url: {{baseUrl}}/api/v1/bookmarks/delete
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "ids": [
+      "550e8400-e29b-41d4-a716-446655440000"
+    ]
+  }
+}
+
+docs {
+  Bulk Delete Bookmarks
+}
+
+example {
+  name: 200 Response
+  description: Bookmarks bulk deleted
+  
+  request: {
+    url: {{baseUrl}}/api/v1/bookmarks/delete
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "ids": [
+          "550e8400-e29b-41d4-a716-446655440000"
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "deleted": 0
+        }
+      '''
+    }
+  }
+}

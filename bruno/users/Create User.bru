@@ -1,0 +1,66 @@
+meta {
+  name: Create User
+  type: http
+  seq: 1
+  tags: [
+    Users
+  ]
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Jane Doe",
+    "email": "jane@example.com"
+  }
+}
+
+docs {
+  Create User
+}
+
+example {
+  name: 201 Response
+  description: User created
+  
+  request: {
+    url: {{baseUrl}}/api/v1/users
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "name": "Jane Doe",
+        "email": "jane@example.com"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "name": "",
+          "email": "",
+          "createdAt": "",
+          "updatedAt": ""
+        }
+      '''
+    }
+  }
+}

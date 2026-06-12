@@ -1,0 +1,60 @@
+meta {
+  name: Get User
+  type: http
+  seq: 2
+  tags: [
+    Users
+  ]
+}
+
+get {
+  url: {{baseUrl}}/api/v1/users
+  body: none
+  auth: inherit
+}
+
+headers {
+  x-user-id: {{userId}}
+}
+
+docs {
+  Get User
+}
+
+example {
+  name: 200 Response
+  description: User retrieved
+  
+  request: {
+    url: {{baseUrl}}/api/v1/users/:id
+    method: GET
+    mode: none
+    params:path: {
+      id: 550e8400-e29b-41d4-a716-446655440000
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "name": "",
+          "email": "",
+          "createdAt": "",
+          "updatedAt": ""
+        }
+      '''
+    }
+  }
+}
