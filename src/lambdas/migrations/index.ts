@@ -1,97 +1,20 @@
-import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
-import { AuroraDSQLPool } from "@aws/aurora-dsql-node-postgres-connector";
 import { Logger } from "@aws-lambda-powertools/logger";
-
-const MIGRATIONS_TABLE = "__drizzle_migrations";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import type { Database, Config as DB } from "~src/shared/db";
+import { getDb } from "~src/shared/db";
 
 interface Config {
-	db: {
-		endpoint: string;
-	};
+	db: DB;
 	source: string;
-}
-
-interface Migration {
-	tag: string;
-	sql: string;
 }
 
 // Initialize observability tooling.
 const serviceName = "Migrations";
 const logger = new Logger({ serviceName });
 
-/**
- * Apply all pending schema migrations.
- * @param conn Database connection pool.
- */
-const applyMigrations = async (conn: AuroraDSQLPool, source: string): Promise<void> => {
-	logger.info("Running database migrations.");
-
-	// Get the list of migrations that need to be applied.
-	const applied = await getApplied(conn);
-	const pending = readFiles(source).filter((m) => !applied.has(m.tag));
-
-	for (const migration of pending) {
-		logger.info(`Applying migration ${migration.tag}.`);
-
-		const statements = migration.sql
-			.split("--> statement-breakpoint")
-			.map((s) => s.trim())
-			.filter((s) => s.length > 0);
-
-		for (const stmt of statements) {
-			await conn.query(stmt);
-		}
-
-		await conn.query(`INSERT INTO "${MIGRATIONS_TABLE}" (id, hash, tag, created_at) VALUES ($1, $2, $3, $4)`, [
-			crypto.randomUUID(),
-			crypto.createHash("sha256").update(migration.sql).digest("hex"),
-			migration.tag,
-			Date.now(),
-		]);
-	}
-};
-
-/**
- * Create a database connection.
- * @param endpoint URI endpoint for the database cluster.
- * @returns The created connection.
- */
-const createConnection = (endpoint: string): AuroraDSQLPool => {
-	logger.info("Creating database connection.");
-	return new AuroraDSQLPool({
-		host: endpoint,
-		user: "admin",
-		options: `-c search_path=public`,
-	});
-};
-
-/**
- * Create the migrations tracking table.
- * @param conn Database connection pool.
- */
-const createTable = async (conn: AuroraDSQLPool): Promise<void> => {
-	logger.info("Ensuring migrations table exists.");
-	await conn.query(`
-        CREATE TABLE IF NOT EXISTS "${MIGRATIONS_TABLE}" (
-            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-            hash text NOT NULL,
-            tag text NOT NULL,
-            created_at bigint
-        )
-    `);
-};
-
-/**
- * Get the list of applied migrations from the database.
- * @param  conn Database connection pool.
- * @returns The list of applied mitrations.
- */
-const getApplied = async (conn: AuroraDSQLPool): Promise<Set<string>> => {
-	const result = await conn.query(`SELECT tag FROM "${MIGRATIONS_TABLE}" ORDER BY created_at`);
-	return new Set(result.rows.map((r: { tag: string }) => r.tag));
+const createConnection = async (config: DB): Promise<Database> => {
+	logger.info("Connecting to database.");
+	return await getDb(config);
 };
 
 /**
@@ -102,37 +25,38 @@ const loadConfig = (): Config => {
 	logger.info("Loading configuration from environment.");
 
 	const migrations = process.env.MIGRATIONS_DIR || "./migrations";
+	const port = parseInt(process.env.DB_PORT ?? "5432");
 
-	const endpoint = process.env.DB_ENDPOINT;
-	if (!endpoint) {
-		throw new Error("DB_ENDPOINT environment variable is required.");
+	const host = process.env.DB_HOST;
+	if (!host) {
+		throw new Error("DB_HOST environment variable is required.");
+	}
+
+	const name = process.env.DB_NAME;
+	if (!name) {
+		throw new Error("DB_NAME environment variable is required.");
+	}
+
+	const user = process.env.DB_USER;
+	if (!user) {
+		throw new Error("DB_USER environment variable is required.");
 	}
 
 	return {
 		source: migrations,
 		db: {
-			endpoint,
+			host,
+			name,
+			port,
+			user,
 		},
 	};
 };
 
-/**
- * Read migrations from file.
- * @param source The migrations source directory.
- * @returns The list of migrations.
- */
-const readFiles = (source: string): Migration[] => {
-	logger.info("Loading migrations from source directory.");
-	const journal = JSON.parse(fs.readFileSync(path.join(source, "meta", "_journal.json"), "utf-8")) as {
-		entries: Array<{ tag: string }>;
-	};
-
-	return journal.entries.map((e) => {
-		const file = path.join(source, `${e.tag}.sql`);
-		return {
-			tag: e.tag,
-			sql: fs.readFileSync(file, "utf-8"),
-		};
+const runMigrations = async (db: Database, source: string): Promise<void> => {
+	logger.info("Running database migrations.");
+	await migrate(db, {
+		migrationsFolder: source,
 	});
 };
 
@@ -144,7 +68,6 @@ const readFiles = (source: string): Migration[] => {
 export const handler = async (_event: unknown, _context: unknown): Promise<void> => {
 	logger.info("Starting database migration process.");
 	const config = loadConfig();
-	const conn = createConnection(config.db.endpoint);
-	await createTable(conn);
-	await applyMigrations(conn, config.source);
+	const db = await createConnection(config.db);
+	await runMigrations(db, config.source);
 };

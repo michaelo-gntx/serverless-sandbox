@@ -1,17 +1,22 @@
 {
 	"name": "serverless-sandbox",
 	"version": "0.1.0",
+	"private": true,
 	"scripts": {
 		"build": "tsgo",
 		"watch": "tsgo -w",
 		"test": "jest",
-		"cdk": "cdk"
+		"cdk": "cdk",
+		"session:rds": "bun run ./scripts/rds-session.ts"
 	},
 	"dependencies": {
 		"@aws-cdk/aws-dsql-alpha": "^2.258.0-alpha.0",
 		"@aws-lambda-powertools/logger": "^2.33.1",
 		"@aws-lambda-powertools/tracer": "^2.33.1",
+		"@aws-sdk/client-secrets-manager": "^3.1066.0",
+		"@aws-sdk/client-ssm": "^3.1066.0",
 		"@aws-sdk/dsql-signer": "^3.1063.0",
+		"@aws-sdk/rds-signer": "^3.1066.0",
 		"@aws/aurora-dsql-node-postgres-connector": "^0.1.9",
 		"@hono/swagger-ui": "^0.6.1",
 		"@hono/zod-openapi": "^1.4.0",
@@ -36,6 +41,5 @@
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "~5.9.3"
-	},
-	"private": true
+	}
 }

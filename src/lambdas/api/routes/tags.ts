@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono, type z } from "@hono/zod-openapi";
-import { getDb } from "~src/shared/db/client";
 import { UuidParamSchema } from "~src/shared/schemas/common";
 import { CreateTagSchema, TagListSchema, TagWithUsageSchema, UpdateTagSchema } from "~src/shared/schemas/tags";
 import { createTag, deleteTag, listTags, updateTag } from "~src/shared/services/tags";
@@ -33,8 +32,7 @@ const listTagsRoute = createRoute({
 
 router.openapi(listTagsRoute, async (c) => {
 	const userId = c.get("userId");
-	const db = getDb();
-	const { data, total } = await listTags(db, userId, { limit: 100, offset: 0 });
+	const { data, total } = await listTags(c.var.db, userId, { limit: 100, offset: 0 });
 	return c.json(
 		{
 			data: data.map(serializeTag) as z.infer<typeof TagWithUsageSchema>[],
@@ -64,8 +62,7 @@ const createTagRoute = createRoute({
 router.openapi(createTagRoute, async (c) => {
 	const data = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const tag = await createTag(db, userId, data);
+	const tag = await createTag(c.var.db, userId, data);
 	return c.json({ ...serializeTag(tag), usageCount: 0 } as z.infer<typeof TagWithUsageSchema>, 201);
 });
 
@@ -91,10 +88,9 @@ router.openapi(updateTagRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const data = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const tag = await updateTag(db, userId, id, data);
+	const tag = await updateTag(c.var.db, userId, id, data);
 	// Re-fetch usage count after update
-	const { data: tags } = await listTags(db, userId, { limit: 1, offset: 0 });
+	const { data: tags } = await listTags(c.var.db, userId, { limit: 1, offset: 0 });
 	const usageCount = tags.find((t) => t.id === id)?.usageCount ?? 0;
 	return c.json({ ...serializeTag(tag), usageCount } as z.infer<typeof TagWithUsageSchema>, 200);
 });
@@ -114,7 +110,6 @@ const deleteTagRoute = createRoute({
 router.openapi(deleteTagRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const userId = c.get("userId");
-	const db = getDb();
-	await deleteTag(db, userId, id);
+	await deleteTag(c.var.db, userId, id);
 	return c.body(null, 204);
 });

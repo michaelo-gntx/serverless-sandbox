@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono, type z } from "@hono/zod-openapi";
-import { getDb } from "~src/shared/db/client";
 import {
 	CollectionListSchema,
 	CollectionSchema,
@@ -39,8 +38,7 @@ const listCollectionsRoute = createRoute({
 router.openapi(listCollectionsRoute, async (c) => {
 	const { limit, offset } = c.req.valid("query");
 	const userId = c.get("userId");
-	const db = getDb();
-	const { data, total } = await listCollections(db, userId, { limit, offset });
+	const { data, total } = await listCollections(c.var.db, userId, { limit, offset });
 	return c.json(
 		{
 			data: data.map(serializeCollection) as z.infer<typeof CollectionSchema>[],
@@ -70,8 +68,7 @@ const createCollectionRoute = createRoute({
 router.openapi(createCollectionRoute, async (c) => {
 	const data = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const collection = await createCollection(db, userId, data);
+	const collection = await createCollection(c.var.db, userId, data);
 	return c.json(serializeCollection(collection) as z.infer<typeof CollectionSchema>, 201);
 });
 
@@ -93,8 +90,7 @@ const getCollectionRoute = createRoute({
 router.openapi(getCollectionRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const userId = c.get("userId");
-	const db = getDb();
-	const collection = await getCollectionById(db, userId, id);
+	const collection = await getCollectionById(c.var.db, userId, id);
 	return c.json(serializeCollection(collection) as z.infer<typeof CollectionWithCountSchema>, 200);
 });
 
@@ -120,8 +116,7 @@ router.openapi(updateCollectionRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const data = c.req.valid("json");
 	const userId = c.get("userId");
-	const db = getDb();
-	const collection = await updateCollection(db, userId, id, data);
+	const collection = await updateCollection(c.var.db, userId, id, data);
 	return c.json(serializeCollection(collection) as z.infer<typeof CollectionSchema>, 200);
 });
 
@@ -140,8 +135,7 @@ const deleteCollectionRoute = createRoute({
 router.openapi(deleteCollectionRoute, async (c) => {
 	const { id } = c.req.valid("param");
 	const userId = c.get("userId");
-	const db = getDb();
-	await deleteCollection(db, userId, id);
+	await deleteCollection(c.var.db, userId, id);
 	return c.body(null, 204);
 });
 

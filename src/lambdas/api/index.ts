@@ -5,7 +5,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { handle } from "hono/aws-lambda";
 import { logger as requestLogger } from "hono/logger";
 import { AppError } from "~src/shared/errors";
-import { traceMethod } from "./middleware";
+import { db, traceMethod } from "./middleware";
 import { router as bookmarks } from "./routes/bookmarks";
 import { router as collections } from "./routes/collections";
 import { router as root } from "./routes/root";
@@ -40,6 +40,7 @@ const app = new OpenAPIHono<AppEnv>({
 });
 
 // Global middleware
+app.use(db);
 app.use(traceMethod(tracer));
 app.use(
 	requestLogger((msg: string, ...extra: string[]) => {
